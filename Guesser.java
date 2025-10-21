@@ -58,8 +58,10 @@ public class Guesser {
    * a valid reply. Return the String that you read from
    * the player.
    */
+
+ Scanner scanner = new Scanner(System.in);
   private String getReply() {
-    Scanner scanner = new Scanner(System.in);
+   
     String reply = "";
 
     while (true) {
@@ -69,7 +71,7 @@ public class Guesser {
       } else {
       System.out.println("Write either 'T' or 'F'");
     }
-    scanner.close();
+    
     }
 
     // Write code here which reads a String from the console.
@@ -111,5 +113,6 @@ public class Guesser {
         " (took me " + numberOfGuesses +
         " guesses)");
   }
+  
 
 }
