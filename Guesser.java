@@ -60,13 +60,17 @@ public class Guesser {
    */
   private String getReply() {
     Scanner scanner = new Scanner(System.in);
-    String reply = scanner.nextLine();
+    String reply = "";
 
-    while (!reply.equals("T") || !reply.equals("F")) {
+    while (true) {
+      reply = scanner.nextLine();
+      if (reply.equals("T") || reply.equals("F")) {
+        return reply;
+      } else {
       System.out.println("Write either 'T' or 'F'");
     }
     scanner.close();
-    return reply;
+    }
 
     // Write code here which reads a String from the console.
     // As long as it is not a valid reply (one of "T" and "F")
