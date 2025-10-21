@@ -11,5 +11,7 @@ javac GuessingGame.java
 echo "Running game..."
 java GuessingGame
 echo "done"
+echo ""
+echo "removing class files..."
 rm *.class
 ls
