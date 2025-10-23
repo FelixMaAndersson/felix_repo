@@ -1,0 +1,594 @@
+!! först vill jag bara säga att jag skrivit texten som markdown, 
+ifall du vill spara om den som det för att enklare kunna läsa min inlämning. !!
+
+# **Vad är pull repektive push?**
+
+git push och git pull är kontakten mellan mitt lokala repo och mitt remote 
+repo. Med hjälp av push skickar jag det jag gjort till mitt remote repository. 
+Med git pull hämtar jag från mitt remote repository till mitt lokala repo.
+
+# **När använder man log respektive status?**
+
+Git log ger dig en lista på vem som gjort vad och när. Det är typ ditt 
+projekts dagbok (vilket namnet ’log’ skvallrar om).
+
+Git status visar ifall du har något i ditt lokala repo som behöver läggas till 
+i stageing area, eller om du har något i din stageing area som behöver 
+commitas. 
+
+Så log använder du när du vill se historiken på projektets commits. Status 
+använder du för att se hur ditt lokala repo synkar med stageing area och 
+commits. 
+
+
+# **Vad är en Git branch och varför är de viktiga?**
+
+De behöver du för att kunna arbeta tillsammans med någon i samma projekt. 
+Branches är också bra för att kunna jobba med olika saker och ha det tydligt 
+separerat (exempelvis kan man kanske ha en inlog-branch och en exceptions-
+branch)
+
+# **Det finns flera sätt att rulla tillbaka koden till ett tidigare tillstånd.** 
+(Förklara skillnaden och motivera när man skulle använda den ena eller andra metoden. 
+Ge exempel på de kommandon du använder för att göra detta och vissa att det fungerar, 
+vilken output du fick från git-kommandona.)
+
+## RESET
+
+I grova drag kan man säga att reset flyttar HEAD till tidigare commiter. 
+
+
+Det finns tre versioner av reset:
+
+
+### Soft:
+
+Soft reset flyttar bara HEAD till en tidigare commit, men lämnar allt annat 
+orört, alltså:
+
+Staging area
+Working directory
+
+Soft reset är exempelvis bra när man varit för snabb med att comitta, när man 
+vill lägga till något mer i staging area, eller att man vill ändra commit-
+meddelande. Det kan också vara ifall man vill slå ihop gjorda commits. (ex. 
+Det kanske blir onödigt mycket att commita att man påbörjat en konstruktor och 
+sedan commita att man gjort klart konstruktorn.)
+
+**Kod:**
+
+```java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+```
+
+**skalet:**
+
+```bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+df2e2f2 (HEAD -> master) created new App
+ed17469 (origin/master) Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git reset --soft HEAD~1
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+ed17469 (HEAD -> master) Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git status
+On branch master
+Your branch is behind 'origin/master' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   App.java
+```
+
+```java
+**kod:**
+
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+```
+
+Här ser man att HEAD flyttat bak till tidigare commit, hur koden förblir den 
+samma (alltså working directory) samt att filen ligger i staging area. Så här ändrar man alltså inte koden.
+
+### Mixed:
+
+Är **resets default-läge**. Gör precis som soft, men tar även bort från staging area. 
+
+Bra när man varit för snabb med att stagea och comitta. 
+
+Exempelvis borde jag kanske gjort det någon gång i denna inlämningsuppgift där 
+jag varit lite för snabb med att adda och commita innan jag verkligen var 100% 
+klar med steget som jag comittade (exempelvis metoden som jag senare fixade 
+Scannern i). En samarbetspartner behöver antagligen inte veta att jag flyttade 
+en scanner.
+
+**kod:**
+```java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+```
+
+**skalet:**
+```Bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+df2e2f2 (HEAD -> master, origin/master) created new App
+ed17469 Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git reset --mixed HEAD~1
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+ed17469 (HEAD -> master) Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git status
+On branch master
+Your branch is behind 'origin/master' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        App.java
+
+nothing added to commit but untracked files present (use "git add" to track)
+```
+
+**kod:**
+```java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}
+```
+
+Här ser vi alltså att vi även tagit bort från staging area, men precis som i 
+soft så har vår **kod lämnats oförändrad.**
+
+### Hard:
+
+Nu tar vi i med hårdhandskarna. Vi flyttar HEAD, vi tar bort från staging area 
+OCH vi tar bort ändringarna som gjorts i den senaste commiten i working 
+directory. Alltså själva filen! Läskigt! **Och nu äntligen ändrar vi vår kod!**
+
+Väldigt farligt, då man i praktiken raderar arbete man gjort. En hard reset 
+kan vara bra om man råkade få med känslig data i koden, som inte ska finnas i 
+exempelvis GitHub. 
+
+Ifall man känner att man har hamnat HELT snett och verkligen vill börja om, då 
+är hard reset säkert också bra. 
+
+**kod:**
+```java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Nahid!");
+    }
+}
+```
+
+**skalet:**
+```bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+4fbb8ec (HEAD -> master) changed the hello phrase
+ed17469 Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git reset --hard HEAD~1
+HEAD is now at ed17469 Add note about adding things directly from GitHub
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+ed17469 (HEAD -> master) Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+```
+
+**kod:**
+```java
+
+```
+
+
+ja... som du ser är en hard reset riktigt lurigt, för jag glömde att adda och 
+commita App.java i sin ursprungsversion, så när jag gjorde en hard reset 
+försvann hela filen. Allt backar. working directory, commit och staging area. 
+För att lösa detta problem behöver vi titta i Gits internminne (git reflog) 
+och därifrån leta upp min commit och sen reseta hard med reflog-indexet.
+
+## Restore:
+
+git restore jobbar bara med filerna i min working directory. Så restore vill 
+du använda om du vill backa tillbaka till en version i en tidigare commit. Du 
+kan även ta bort en fil från staging area. Perfekt om du hållt på att arbeta 
+och känner att, "nä det här blev inget bra, jag vill börja om från där jag var 
+senast (eller näst senast, eller näst-näst osv, du fattar.)". Det är ju också 
+toppen för när man stageat något och känner "nämen jag kanske skulle ta och 
+förtydliga den grejen i min kod innan jag committar detta arbete".
+
+exempel:
+
+```bash
+git restore App.java //App.java ändras tillbaka till hur den såg ut i den 
+senaste commiten
+
+git restore --staged App.java //App.java tas bort från staging area, men 
+lämnar filen i working directory orörd.
+```
+
+**exempel på restore:**
+```bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ nano App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git commit -m "created new App"
+[master 2eed1b2] created new App
+ 1 file changed, 5 insertions(+)
+ create mode 100644 App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+2eed1b2 (HEAD -> master) created new App
+ed17469 Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ nano App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Nahid!");
+    }
+}
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git restore App.java 
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+```
+
+Ja, som man ser så återställs mina ändringar till hur koden såg ut i den senaste 
+commiten.
+
+**exempel på restore --staged:**
+```Bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Nahid!");
+    }
+}felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ nano App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java 
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Gitten!");
+    }
+}
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git add App.java 
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git status 
+On branch master
+Your branch and 'origin/master' have diverged,
+and have 1 and 1 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   App.java
+
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git restore --staged App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java 
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Gitten!");
+    }
+}
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git status 
+On branch master
+Your branch and 'origin/master' have diverged,
+and have 1 and 1 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   App.java
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+Ja, här ser man hur ändringarna i mitt working directory **inte ändrats**, men 
+att min stage tagits bort.
+
+## Reverse:
+
+Tillslut så har vi då äntligen kommit fram till reverse! Jag tänker på reverse 
+som den *otroliga kompromissen*. Du får lov att fullständigt backa tillbaks till 
+en tidigare commit, fast utan att förlora historiken. Allt backas, exakt som i 
+hard reset, MEN det finns en megaviktig detalj som gör att detta är ett helt 
+lugnt förfarande: istället för att verkligen backa till den commiten (flytta 
+HEAD) så skapar den en ny commit av commiten jag vill backa tillbaks till. Typ 
+såhär:
+
+vi har tre commiter:
+
+A, B, C
+
+Vi vill ha tillbaka så som koden var i B, men vem vet, det kanske finns något 
+gött i C, så då gör vi en reverse till B som nu då är commit D, fast med B:s kod:
+
+A, B, C, D(b)
+
+**Exempel:**
+```bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Gitten!");
+    }
+}
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ nano App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java 
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Nahid!");
+    }
+}
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git add App.java 
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git commit -m "changed the hello phrase again"
+[master cabc484] changed the hello phrase again
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git push
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 336 bytes | 48.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/FelixMaAndersson/rebase-demo.git
+   72c968a..cabc484  master -> master
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+cabc484 (HEAD -> master, origin/master) changed the hello phrase again
+72c968a changed hello phrase
+2eed1b2 created new App
+ed17469 Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git revert cabc484
+[master 3a74e6a] Revert "changed the hello phrase again"
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git push
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 365 bytes | 52.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/FelixMaAndersson/rebase-demo.git
+   cabc484..3a74e6a  master -> master
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ git log --oneline
+3a74e6a (HEAD -> master, origin/master) Revert "changed the hello phrase again"
+cabc484 changed the hello phrase again
+72c968a changed hello phrase
+2eed1b2 created new App
+ed17469 Add note about adding things directly from GitHub
+54c63e1 added text to the main-file
+fb12499 created main.txt
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$ cat App.java 
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Gitten!");
+    }
+}
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/Documents/java_utbildning/se/yrgo/utvecklingsverktyg/rebase-demo$
+```
+
+Så, här kan man se att effekterna av commit cabc484 är borta i koden i min senaste commit, då jag gjort en commit som gör motsatsen till den commiten. 
+Jag är tillbaks så som det var innan cabc484, men jag har inte tagit bort den commiten. I princip kan man säga att commit 3a74e6a är samma som commit 72c968. 
+Jag har backat (men alltså inte flyttat bak HEAD), utan att ha ändrat historiken 
+mer än att jag lagt till en commit i historiken. Det är precis som i photoshop 
+när man kan kopiera fram gammal historik och lägga den överst i historiken.
+
+
+
+Alltså precis som i A,B,C-förenklingen här ovan.
+
+
+-----------
+
+
+Ja, varför inte satsa på VG? Nu kör vi!
+
+Beskriv och jämför hur man kan använda git rebase och git merge i ett scenario där flera utvecklare jobbar på olika feature branches. Diskutera fördelarna och nackdelarna med båda teknikerna, samt hur de påverkar historiken.
+Uppgift: Skapa ett repo med två eller fler feature branches som utvecklare arbetar på. Beskriv hur du löser konflikter som uppstår under rebase och merge och visa slutresultatet i historiken.
+Exempel: Använd kommandon som git rebase, git merge för att illustrera skillnaderna.
+Motivering: Förklara varför rebase ibland används i stället för merge för att hålla en renare historik och när merge är att föredra för att bibehålla kontext mellan commits.
+
+Efter att ha läst och testat detta med rebase/merge har jag kommit fram till detta:
+
+- rebase är i regel toppen när jag jobbar i min egna branch.
+
+- Merge är i regel toppen när du ska slå ihop arbetet med medarbetare.
+
+Varför har jag kommit fram till det?
+
+Vi tar det från början.
+
+Du och jag jobbar på något där man ska kunna logga in.
+Du jobbar med signup, jag med login, vi har varsin feature-branch:
+
+feature/login
+feature/signup
+
+Du har gjort ändringar på din signup-branch och ska nu mergea.
+
+Ifall du har gjort ändringar i rader som finns commitat i main kommer då en konflikt att uppstå:
+
+```java
+<<<<<<< HEAD
+        System.out.println("Hello, world!");
+=======
+        System.out.println("Hello, Felix!");
+>>>>>>> feature/login
+```
+
+Nu behöver du bestämma vilken av koden vi använder. Ska vi printa World, eller
+ Felix? Du bestämmer dig för Felix:
+
+```java
+        System.out.println("Hello, Felix!");
+```
+
+När du sedan har löst konflikten lägger du till och committar på nytt:
+```bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git add App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git commit
+[main 80f9ea9] Merge branch 'feature/signup'
+```
+
+historiken:
+```bash
+80f9ea9 (HEAD -> main, origin/main) Merge branch 'feature/signup'
+ada043a (feature/login) Changed phrase to Hello, Nahid!
+dbef3b9 (feature/signup) changed hello phrase
+6c3e497 created App
+```
+
+Om jag nu då på min login-branch vill **rebase** är det bara att pulla main från 
+remote.
+
+```bash
+git checkout main //byter till main
+git pull origin main //vi drar det som finns remote i main till min lokala main.
+```
+
+Sen byter jag tillbaka och rebasear min branch:
+```bash
+git rebase main
+```
+
+Vad händer då då?
+
+Min kod på login-branchen var:
+
+```java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Nahid!");
+    }
+}
+``` 
+och din kod på signup-branchen var:
+
+```java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Felix!");
+    }
+}
+```
+
+Din kod har ju du mergeat till Main, vilket gör att Mains kod och din kod är 
+identisk nu, tack vare att du gjorde det valet för att lösa konflikten som 
+uppstod.
+
+Så nu har jag då rebaseat och har därför din kod även på min branch. För det rebaseades innan det gjordes commits som kunde bli en konflikt. För att skapa en rebase-konflikt behöver vi göra såhär:
+
+```bash
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ echo 'public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}' > App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git add App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git commit -m "World"
+[main 8ae9e24] World
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git checkout feature/login
+Switched to branch 'feature/login'
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ echo 'public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Git!");
+    }
+}' > App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git add App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git commit -m "Git"
+[feature/login c085c92] Git
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git checkout main
+Switched to branch 'main'
+Your branch is ahead of 'origin/main' by 5 commits.
+  (use "git push" to publish your local commits)
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ echo 'public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello, Universe!");
+    }
+}' > App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git add App.java
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git commit -m "Universe"
+[main 7bc244f] Universe
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git checkout feature/login
+Switched to branch 'feature/login'
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git rebase main
+Auto-merging App.java
+CONFLICT (content): Merge conflict in App.java
+error: could not apply c085c92... Git
+hint: Resolve all conflicts manually, mark them as resolved with
+hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+hint: You can instead skip this commit: run "git rebase --skip".
+hint: To abort and get back to the state before "git rebase", run "git rebase --abort".
+Could not apply c085c92... Git
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git add App.java 
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git commit -m "kept both phrases"
+[detached HEAD 862afde] kept both phrases
+ 1 file changed, 4 insertions(+)
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git switch feature/login 
+fatal: cannot switch branch while rebasing
+Consider "git rebase --quit" or "git worktree add".
+felix@DESKTOP-GB5S4I3:/mnt/c/Users/felix/vg/example$ git rebase --continue
+Successfully rebased and updated refs/heads/feature/login.
+```
+
+Vi kan nu också se att jag har mergeat in signup och rebaseat från login, då det uppstått som en förgrening när jag mergeat, men det är en rak linje från min rebase. Detta beror på att Git bevarar båda grenarnas historik när man mergar, men flyttar om commistsen så att det ser ut som att logins commiter alltid legat efter main:
+
+```bash
+* 862afde (HEAD -> feature/login) kept both phrases
+* 7bc244f (main) Universe
+* 8ae9e24 World
+* 57e8878 Universe
+* 661c909 Git
+* cfa729d World
+* 06375bb trying to create a conflict with rebase
+*   80f9ea9 (origin/main) Merge branch 'feature/login'
+|\
+| * ada043a Changed phrase to Hello, Nahid!
+* | dbef3b9 (feature/signup) changed hello phrase
+|/
+* 6c3e497 created App
+```
+
+Man kan se det som att rebase är den städade versionen, det är instagram-
+versionen av ens historia. Snygg och prydlig. Merge är fotorullen på ens telefon 
+oprydlig, och stökig, men sann och utan redigering.
+
+Det är därför som jag förespråkar rebase i din egen branch, då det gör att det 
+blir enklare att följa för alla inblandade + att du inte behöver ha med den helt 
+oredigerade versionen av din arbetsprocess. Det behöver vi (enligt min nybörjar-
+hjärna) dock i våra gemensamma brancher, för att förstå vad som verkligen har 
+hänt. Alltså behålla den ofiltrerade, sanna historiken.
