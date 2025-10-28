@@ -5,10 +5,12 @@ echo "${name}s program"
 mkdir -p "${name}_labb"
 cp ./*.java "./${name}_labb"
 cd ${name}_labb
+echo "Running game from"
 pwd
+echo "Compiling..."
 javac Guesser.java
 javac GuessingGame.java
-echo "Running game..."
+echo "Running..."
 java GuessingGame
 echo "done"
 echo ""
